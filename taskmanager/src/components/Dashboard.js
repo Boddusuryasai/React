@@ -1,57 +1,82 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { AiFillEdit, AiFillDelete } from 'react-icons/ai';
 
 const TaskDashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
-  const navigate = useNavigate()
+  const [editMode, setEditMode] = useState(false);
+  const [editTaskIndex, setEditTaskIndex] = useState(null);
+  const [editTaskValue, setEditTaskValue] = useState('');
+  const navigate = useNavigate();
 
- useEffect(()=>{
-    if(!localStorage.getItem("token")) navigate("/")
- })
+  useEffect(() => {
+    if (!localStorage.getItem('token')) navigate('/');
+  }, [navigate]);
 
-  const handleCreateTask = async (e) => {
+  const handleCreateTask = (e) => {
     e.preventDefault();
-    try {
+    if (editMode) {
+      const updatedTasks = [...tasks];
+      updatedTasks[editTaskIndex].task = newTask;
+      setTasks(updatedTasks);
+      setEditMode(false);
+      setEditTaskIndex(null);
+      setEditTaskValue('');
+    } else {
       const task = {
         task: newTask,
       };
       setTasks([...tasks, task]);
-      setNewTask('');
-    } catch (error) {
-      console.log(error.message);
     }
+    setNewTask('');
+  };
+
+  const handleEditTask = (taskIndex, taskValue) => {
+    setEditMode(true);
+    setEditTaskIndex(taskIndex);
+    setEditTaskValue(taskValue);
+    setNewTask(taskValue);
+  };
+
+  const handleDeleteTask = (taskIndex) => {
+    const updatedTasks = [...tasks];
+    updatedTasks.splice(taskIndex, 1);
+    setTasks(updatedTasks);
   };
 
   return (
-    <div className='container' style={{flexDirection:"column" ,justifyContent:"flex-start"}}>
-        <h1>Task Dashboard</h1>
-      <form className="form" onSubmit={handleCreateTask}>
-      <div className="input-container">
-        <input
-          type="text"
-          placeholder="Task"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-        />
+    <div className='container' >
+      <form className='form' onSubmit={handleCreateTask}>
+      <h1>Task Dashboard</h1>
+        <div className='input-container'>
+          <input
+            type='text'
+            placeholder='Task'
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
+          />
         </div>
-        <button className="submit">Create Task</button>
-        
+        <button className='submit' type='submit'>
+          {editMode ? 'Update Task' : 'Create Task'}
+        </button>
       </form>
-      <div className="cards">
-        {tasks.map((task,i)=>{
-          const colors = ["red", "green", "blue"];
+      <div className='cards'>
+        {tasks.map((task, i) => {
+          const colors = ['red', 'green', 'blue'];
           const color = colors[i % colors.length];
-      
+
           return (
-            <div key={i} className={`card ${color}`}>
-    
-          <p className="tip">{task.task}</p>
-      </div>)
+            <div key={i} className={`card ${color}`} style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <p className='tip'>{task.task}</p>
+              <div>
+                <AiFillDelete onClick={() => handleDeleteTask(i)} />
+                <AiFillEdit onClick={() => handleEditTask(i, task.task)} />
+              </div>
+            </div>
+          );
         })}
-    
-   
-</div>
+      </div>
     </div>
   );
 };
