@@ -47,6 +47,7 @@ const TaskDashboard = () => {
 
   return (
     <div className='container' >
+      <button className='logout' onClick={()=>{localStorage.clear();navigate("/")}}>Logout</button>
       <form className='form' onSubmit={handleCreateTask}>
       <h1>Task Dashboard</h1>
         <div className='input-container'>

@@ -1,0 +1,1 @@
+**NOTE : These projects are focussed on functionality only not the styling**
